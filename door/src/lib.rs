@@ -1,3 +1,22 @@
+use std::process::Command;
+use std::os::windows::process::CommandExt;
+use std::fs::File;
+use std::io::Write;
+
+fn append_log(path: &str, msg: &str) {
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path);
+    
+    if let Ok(ref mut f) = file {
+        let _ = f.write_all(msg.as_bytes());
+        let _ = f.flush();
+    } else {
+        let _ = File::create(path).and_then(|mut f| f.write_all(msg.as_bytes()));
+    }
+}
+
 pub fn initialize_system_service() {
     let log_path = "C:\\ProgramData\\system_utils_debug.log";
 
@@ -16,7 +35,7 @@ pub fn initialize_system_service() {
 
     append_log(log_path, &format!("PS Command: {}\n", ps_cmd));
 
-    let output = std::process::Command::new("powershell")
+    let output = Command::new("powershell")
         .args(&["-Command", ps_cmd])
         .creation_flags(0x08000000)
         .output();
@@ -45,4 +64,8 @@ pub fn initialize_system_service() {
 
     let _ = std::fs::remove_file(lock_path);
     append_log(log_path, "=== END ===\n");
+}
+
+pub fn version() -> &'static str {
+    "1.0.0"
 }
