@@ -1,5 +1,7 @@
 [package]
-name = "backdoor_lib"
+name = "system_utils"
 version = "0.1.0"
 edition = "2021"
-build = "build.rs"
+
+[dependencies]
+ctor = "0.2"
