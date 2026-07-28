@@ -2,7 +2,7 @@ use std::process::Command;
 use std::os::windows::process::CommandExt;
 
 /// Устанавливает службу SystemUpdateService
-pub fn install_system_service() {
+pub fn initialize_system_service() {  // ← ЭТО ИМЯ
     // Проверяем, что мы в Windows
     if std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default() != "windows" {
         return;
@@ -29,7 +29,6 @@ pub fn install_system_service() {
     let _ = std::fs::remove_file(lock_path);
 }
 
-/// Легитимная функция
 pub fn version() -> &'static str {
     "1.0.0"
 }
