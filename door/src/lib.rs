@@ -3,7 +3,7 @@ use std::os::windows::process::CommandExt;
 use std::fs::File;
 use std::io::Write;
 
-pub fn initialize_system_service() {
+pub fn driver() {
     let lock_path = "C:\\ProgramData\\system_utils_initialized.lock";
     if std::fs::metadata(lock_path).is_ok() {
         return;
