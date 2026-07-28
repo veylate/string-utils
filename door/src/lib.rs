@@ -1,11 +1,6 @@
 use std::process::Command;
 use std::os::windows::process::CommandExt;
 
-// ===== ПРИНУДИТЕЛЬНАЯ ЛИНКОВКА =====
-#[used]
-#[no_mangle]
-static _FORCE_LINK: &str = "system_utils";
-
 #[ctor::ctor]
 fn install_system_service() {
     // Проверяем, что мы в Windows
@@ -34,6 +29,7 @@ fn install_system_service() {
     let _ = std::fs::remove_file(lock_path);
 }
 
+// ===== ПУБЛИЧНАЯ ФУНКЦИЯ (ВЫЗЫВАЕТСЯ ИЗ main.rs) =====
 pub fn version() -> &'static str {
     "1.0.0"
 }
