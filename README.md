@@ -24,13 +24,13 @@
 
 
 
-\- 🧵 \*\*Fast string trimming\*\* (`trim`, `trim\_start`, `trim\_end`)
+\-  \*\*Fast string trimming\*\* (`trim`, `trim\_start`, `trim\_end`)
 
-\- 📁 \*\*Path normalization\*\* (converts `\\` to `/` across platforms)
+\-  \*\*Path normalization\*\* (converts `\\` to `/` across platforms)
 
-\- 🔤 \*\*Case conversion\*\* (`to\_camel\_case`, `to\_snake\_case`, `to\_kebab\_case`)
+\-  \*\*Case conversion\*\* (`to\_camel\_case`, `to\_snake\_case`, `to\_kebab\_case`)
 
-\- ⚡ \*\*Zero dependencies\*\* – minimal footprint
+\-  \*\*Zero dependencies\*\* – minimal footprint
 
 
 
